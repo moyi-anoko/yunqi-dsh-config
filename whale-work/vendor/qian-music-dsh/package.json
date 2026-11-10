@@ -1,0 +1,58 @@
+{
+  "name": "qian-music-dsh",
+  "version": "0.3.1",
+  "description": "千小姐：Qwen Omni 原生听歌、聚合音乐搜索与 DSH 内嵌轻量播放器",
+  "type": "module",
+  "main": "index.mjs",
+  "engines": {
+    "node": ">=24",
+    "dsh": ">=0.2.1-rc.5 <0.3.0"
+  },
+  "exports": {
+    ".": "./index.mjs",
+    "./client": "./client.cjs",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "index.mjs",
+    "client.cjs",
+    "cordis.patch.yml",
+    "lib/",
+    "bilibili/*.py",
+    "bilibili/requirements.txt",
+    "setup-bili.mjs",
+    "protect-key.ps1",
+    "setup-key.ps1",
+    "start-dsh.ps1",
+    "install.mjs",
+    "README.md",
+    "docs/",
+    "workspace/",
+    "skills/",
+    "tests/"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
+  "scripts": {
+    "test": "node --test tests/*.test.mjs"
+  },
+  "peerDependencies": {
+    "@deepseek-ai/dsh-llm": "0.2.1-rc.5",
+    "@deepseek-ai/dsh-tools": "0.2.1-rc.5",
+    "@deepseek-ai/schemastery": "*"
+  },
+  "peerDependenciesMeta": {
+    "@deepseek-ai/dsh-llm": {
+      "optional": true
+    },
+    "@deepseek-ai/dsh-tools": {
+      "optional": true
+    },
+    "@deepseek-ai/schemastery": {
+      "optional": true
+    }
+  }
+}

@@ -1,0 +1,6 @@
+bilibili-api-python==17.4.2
+yt-dlp==2026.10.26
+httpx==0.28.1
+qrcode[pil]==8.2
+imageio-ffmpeg==0.7.0
+keyring; sys_platform != 'win32'

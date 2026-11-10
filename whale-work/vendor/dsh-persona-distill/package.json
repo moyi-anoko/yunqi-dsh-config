@@ -1,0 +1,55 @@
+{
+  "name": "dsh-persona-distill",
+  "version": "2.1.1",
+  "description": "DSH 插件：把每天刷到的原料，蒸馏成一个会自己长大的人格 —— 原料天天攒，人格每周长",
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "deepseek-harness",
+    "persona",
+    "memory",
+    "distill"
+  ],
+  "license": "MIT",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "node --test"
+  },
+  "exports": {
+    ".": "./index.js",
+    "./client": "./client.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "index.js",
+    "client.js",
+    "cordis.patch.yml",
+    "lib",
+    "prompts",
+    "CHANGELOG.md",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "dsh": ">=0.1.7-rc.1",
+    "node": ">=22"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "inject": ["slots"]
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Speraymer/dsh-persona-distill.git"
+  },
+  "homepage": "https://github.com/Speraymer/dsh-persona-distill#readme",
+  "bugs": {
+    "url": "https://github.com/Speraymer/dsh-persona-distill/issues"
+  }
+}

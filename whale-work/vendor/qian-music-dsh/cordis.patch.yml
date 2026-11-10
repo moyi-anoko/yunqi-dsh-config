@@ -1,0 +1,3 @@
+- insert:
+    - id: qian-music
+      name: ./index.mjs

@@ -1,0 +1,11 @@
+{
+    "name":  "dsh-soundtry",
+    "description":  "Local audio understanding for DeepSeek Harness: transcription (whisper medium), rhythm, melody, chords, structure — six tools, fully offline. Vocal separation defaults to UVR MDX-Net via onnxruntime (no torch). Dependencies are declared in deps.manifest.json and installed on first run; model weights are downloaded from a mirror, never bundled.",
+    "version":  "1.0.2",
+    "entry":  {
+                  "name":  "dsh-soundtry",
+                  "inject":  [
+                                 "tools"
+                             ]
+              }
+}

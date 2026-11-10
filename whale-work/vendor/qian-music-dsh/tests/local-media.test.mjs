@@ -1,0 +1,24 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {mkdtemp,writeFile,readFile,rm} from 'node:fs/promises';
+import {join} from 'node:path';
+import {tmpdir} from 'node:os';
+import {pathToFileURL} from 'node:url';
+import {importLocalSong,resolveSong,search} from '../lib/providers.mjs';
+import {byteRange} from '../lib/local-media.mjs';
+import {lyrics} from '../lib/lyrics.mjs';
+import {startPlayer} from '../lib/player.mjs';
+test('local byte ranges support seeking, suffixes and invalid-range rejection',()=>{assert.deepEqual(byteRange('bytes=2-5',10),{start:2,end:5,partial:true});assert.deepEqual(byteRange('bytes=-3',10),{start:7,end:9,partial:true});assert.equal(byteRange('bytes=10-',10),null);assert.equal(byteRange('bytes=0-1,3-4',10),null);assert.equal(byteRange('bytes=-0',10),null);});
+test('local songs persist in playlists; media serving requires authorization and supports seek/HEAD/upload',async t=>{
+ const root=await mkdtemp(join(tmpdir(),'qian-local-'));let p;t.after(async()=>{if(p)await p.close();await rm(root,{recursive:true,force:true});});
+ const file=join(root,'本地 sample.wav');await writeFile(file,Buffer.from('0123456789'));await writeFile(join(root,'本地 sample.lrc'),'[00:01.00]本地歌词');
+ const song=await importLocalSong({url:pathToFileURL(file).href,artists:'本机'});assert.equal((await resolveSong(song.key)).localPath,song.localPath);assert.equal((await lyrics(song.key)).rows[0].text,'本地歌词');assert.equal((await search('本地','local')).sources[0].songs.length,1);
+ p=await startPlayer({root});await p.enqueue([song.key],{play:false});const list=await p.library.playlist('create',{name:'本地收藏'});await p.library.playlist('add',{id:list.id,songs:[song]});
+ const u=new URL(p.url),base=u.origin,token=u.hash.slice(1),route=base+'/api/local-audio/'+encodeURIComponent(song.key)+'?token='+token;
+ assert.equal((await fetch(base+'/api/local-audio/'+encodeURIComponent(song.key))).status,401);
+ let r=await fetch(route,{headers:{Range:'bytes=2-5'}});assert.equal(r.status,206);assert.equal(r.headers.get('content-range'),'bytes 2-5/10');assert.equal(await r.text(),'2345');
+ r=await fetch(route,{headers:{Range:'bytes=-3'}});assert.equal(await r.text(),'789');assert.equal((await fetch(route,{headers:{Range:'bytes=10-'}})).status,416);
+ r=await fetch(route,{method:'HEAD'});assert.equal(r.headers.get('content-length'),'10');assert.equal(await r.text(),'');assert.equal((await fetch(base+'/api/state?token='+token)).status,401);
+ r=await fetch(base+'/api/local-import?name='+encodeURIComponent('选择的音源.wav'),{method:'POST',headers:{Authorization:'Bearer '+token},body:Buffer.from('uploaded local media')});assert.equal(r.status,200);const imported=await r.json();assert.equal(imported.song.source,'local');assert.equal(await readFile(imported.song.localPath,'utf8'),'uploaded local media');
+ await p.close();p=await startPlayer({root});assert.equal(p.state().queue.length,2);assert.equal(p.state().playlists[0].songs[0].localPath,song.localPath);assert.equal((await resolveSong(p.state().playlists[0].songs[0].key)).localPath,song.localPath);
+});

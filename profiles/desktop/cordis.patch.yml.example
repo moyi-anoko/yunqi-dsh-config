@@ -1,0 +1,107 @@
+# Your patch layer for this dsh profile, applied after every bundle layer:
+# a top-level YAML array of loader patch entries (id-targeted config
+# overrides, disables, and insert lists; `!!js` expressions allowed).
+- id: agent-default-model
+  name: "@deepseek-ai/dsh-agent-default-model"
+  config:
+    provider: deepseek-account
+    model: deepseek-flash
+    reasoningEffort: high
+- id: ui-settings-account
+  name: "@deepseek-ai/dsh-client-ui-settings-account"
+  config:
+    version: 1
+    step: done
+    purpose: null
+    process: standard
+    completion: skipped
+    usage: compact
+    developerTools: false
+- id: ui-chat
+  name: "@deepseek-ai/dsh-client-ui-chat"
+  config:
+    transcriptView: standard
+    performanceUsage: compact
+    linkOpening: new-tab
+- id: ui-settings
+  name: "@deepseek-ai/dsh-client-ui-settings"
+  config:
+    enabled: true
+- insert:
+    - id: qian-music
+      name: "C:/Users/35218/.dsh/profiles/desktop/node_modules/qian-music-dsh/index.m\
+        js"
+
+- id: genui
+  name: dsh-genui
+  config:
+    sectionOrder: 80
+    sectionName: genui:cards
+    promptEnabled: true
+
+- insert:
+    - id: dsh-onebot
+      name: "dsh-onebot-qq"
+      config:
+        mode: forward
+        host: 127.0.0.1
+        port: 3001
+        accessToken: REPLACE_ME_ONEBOT_ACCESS_TOKEN
+        adminUsers: [ "2758602560", "3521807482" ]
+        # 2026-11-08 19:36 群聊停闸：模型在群里退化复读，先关掉所有群（热加载，立即生效）。
+        # 2026-11-08 21:22 重启后出站护栏已加载，改回 open（复读靠 lib\outbound.js 的三层护栏兜）。
+        groupPolicy: open
+        textImageThreshold: 0
+        workspacePath: 'C:\Users\35218\.dsh\whale-work'
+        # 任务运行中收到的新消息：默认插话进当前回合（不再各自排成新回合，避免连发几条时回答错位）
+        newMessagePolicy: steer
+        autoSteerPolicy: admin
+        notices:
+          steerAccepted: false
+          queue: false
+    - id: onebot-settings-remote
+      name: "dsh-onebot-qq/settings-remote"
+
+- insert:
+    - id: loop-valve
+      name: "dsh-thinking-guard/escape-valve"
+      inject: [ agents ]
+      config:
+        enabled: true
+        minRepeats: 25
+- insert:
+    - id: yunqi-memory
+      name: "C:/Users/35218/.dsh/plugins/yunqi-memory/index.js"
+      config:
+        dir: ""
+        captureReasoning: true
+        captureToolResults: false
+        stateInject: true
+- id: dsh-ops
+  config:
+    global:
+      bash: true
+      hidePwsh: true
+      hideOfficialTools: false
+      dynamicTools: true
+    presets:
+      standard:
+        enabled: true
+        files: false
+        residentTools: false
+        shell: true
+        discovery: true
+        replaceOfficial: false
+- id: dsh-video-storyboard
+  disabled: false
+- id: univer
+  disabled: false
+- id: ui-conversation
+  name: "@deepseek-ai/dsh-client-ui-conversation"
+  config:
+    busyEnter: steer
+- id: agent-preset-registry
+  name: "@deepseek-ai/dsh-agent-preset-registry"
+  config:
+    default: standard
+    selectedDefault: standard

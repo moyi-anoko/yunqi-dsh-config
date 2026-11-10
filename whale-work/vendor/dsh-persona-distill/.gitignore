@@ -1,0 +1,4 @@
+node_modules/
+*.log
+last-run.txt
+.DS_Store

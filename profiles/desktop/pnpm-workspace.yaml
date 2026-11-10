@@ -1,0 +1,15 @@
+packages:
+  - .
+
+nodeLinker: hoisted
+autoInstallPeers: false
+minimumReleaseAgeExclude:
+  - billion-context@0.1.202
+  - '@michengai/dsh-automation@1.0.4'
+  - '@michengai/dsh-agency-agents@1.2.7'
+  - '@zaofan/dsh-qqbot@1.12.6'
+  - dsh-onebot-qq@0.9.18
+  - dsh-ops@0.5.2
+allowBuilds:
+  onnxruntime-node@1.30.0: true
+  protobufjs@7.6.6: true

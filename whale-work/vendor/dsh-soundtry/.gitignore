@@ -1,0 +1,21 @@
+# 运行时产物，不进仓库
+runtime/
+models/
+vendor/
+cache/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# 日志与临时文件
+*.log
+*.srt
+*.tmp
+
+# 编辑器
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

@@ -1,0 +1,11 @@
+node_modules/
+.env
+private/
+data/
+cache/
+*.xml
+*.pem
+*.log
+__pycache__/
+*.pyc
+*.dpapi

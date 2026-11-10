@@ -1,0 +1,56 @@
+# inbound
+行数 729 -> 749
+删除行 8，新增行 28
+
+--- 删除（前 20）---
+-         if (kind === 'group' && this.ctx.config.requireMention && !mentioned) {
+-         // [yunqi-local] 2026-11-08 群准入两条规则（主人定；插件升级会覆盖，见 人格/onebot-merge-改动记录.md）：
+-         //   群 645937444（深水区）：只有主人 3521807482 的 @ 才继续，其他一律静默丢弃；
+-         //   群 1132779252：通过 @ 校验后再掷骰子，Math.random() >= 0.05 静默丢弃（约 5% 概率回复）。
+-             if (groupId === '645937444' && userId !== '3521807482') {
+-                 this.ctx.log('debug', '[yunqi-local] 深水区非主人消息，静默丢弃: ' + userId);
+-             if (groupId === '1132779252' && Math.random() >= 0.05) {
+-                 this.ctx.log('debug', '[yunqi-local] 5% 概率闸门，静默丢弃: ' + userId);
+
+--- 新增（前 30）---
++         // [yunqi-local-q] 2026-11-08 主人要求：群里发 /q 时群里一个字的回执都不发，
++         // 整条转到他自己的私聊回合处理（回复、报错、「已完成」状态全部走私聊）。
++         // 重写后 kind=private，由 dmAllowed 决定放不放行：管理员放行，
++         // 普通成员被私聊白名单静默丢掉 —— 不能靠 /q 给自己提权。
++         if (inbound.kind === 'group' && /^\/q(?:[\s\u3000]|$)/i.test(inbound.text.trim())) {
++             const quietText = inbound.text.trim().replace(/^\/q[\s\u3000]*/i, '');
++             this.ctx.log('debug', '[yunqi-local] /q 静默：群 ' + inbound.groupId + ' 不回，转私聊 ' + inbound.userId);
++             inbound = {
++                 ...inbound,
++                 kind: 'private',
++                 chatId: 'private:' + inbound.userId,
++                 groupId: undefined,
++                 text: quietText,
++                 mentioned: true,
++             };
++         if (kind === 'group' && this.ctx.config.requireMention && !mentioned && groupId !== '1132779252' && groupId !== '645937444') {
++         // [yunqi-local-gate-v4] 2026-11-08 群准入规则（主人定；插件升级会覆盖，见 人格/onebot-merge-改动记录.md）：
++         //   群 645937444（深水区，主人只是成员，群主是牢Chess）与 1132779252（肥鱼大奖赛·朝鱼）统一：
++         //     任何人 @ 我（或引用我的消息）一律回，不掷骰子；
++         //     没 @ 的：主人的消息直接放行；别人的要有文字内容才统一掷骰子，
++         //     Math.random() >= 0.05 静默丢弃（约 5% 概率回复）；空消息与纯图/纯表情直接丢。
++             if (groupId === '645937444' || groupId === '1132779252') {
++                 if (!mentioned && userId !== '3521807482') {
++                     const gateText = String(inbound.text ?? '').trim();
++                     const gateHasContent = gateText.length > 0 && !/^\[[^\]]{1,6}\]$/.test(gateText);
++                     if (!gateHasContent || Math.random() >= 0.05) {
++                         this.ctx.log('debug', '[yunqi-local] 未@且未中 5% 概率闸门，静默丢弃: ' + userId);
++                         return;
+
+# chat
+行数 138 -> 141
+删除行 1，新增行 4
+
+--- 删除（前 20）---
+-     return 'onebot-' + chatId.replace(/[^A-Za-z0-9-]/g, '-');
+
+--- 新增（前 30）---
++     // [yunqi-local] 2026-11-08 主人要求：私信与群聊共用同一个 agent 会话（「我」是一个，不是三个）。
++     // 由 工具/安装与补丁/repatch-onebot-qq.mjs 注入；插件升级会覆盖，升级后重跑。
++     void chatId;
++     return 'onebot-yunqi';

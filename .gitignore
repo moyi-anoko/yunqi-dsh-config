@@ -1,0 +1,46 @@
+# ===== 数据与运行状态：不进仓库 =====
+sessions/
+state/
+shots/
+attachments/
+media/
+cache/
+storages/
+telemetry/
+tmp/
+node_modules/
+profiles/*/node_modules/
+profiles/*/.cache/
+
+# 工作区：只留 vendor 里的插件源码，其余（日记、作品、下载）不进
+whale-work/*
+!whale-work/vendor/
+
+# vendor 里的大资源：代码进仓库，模型和 ffmpeg 不进
+whale-work/vendor/dsh-soundtry/models/
+whale-work/vendor/dsh-soundtry/vendor/ffmpeg/
+whale-work/vendor/dsh-memewiki/data/memes.db
+
+# ===== 密钥与凭据：绝不进仓库 =====
+.credentials.yaml
+spawn-token
+*-token
+bili-whale.config.json
+secrets.local.yml
+profiles/*/cordis.patch.yml
+
+# ===== 备份文件 =====
+*.bak
+*.bak-*
+*.bak2-*
+*.bak-before-*
+
+# ===== 日志 =====
+*.log
+*.log.jsonl
+
+# ===== 零散数据文件 =====
+whale-*.md
+whale-*.json
+whale-*.jsonl
+plugins/yunqi-memory/

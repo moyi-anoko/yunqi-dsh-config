@@ -1,0 +1,69 @@
+{
+    "name":  "dsh-soundtry",
+    "version":  "1.0.2",
+    "description":  "DSH 的本地听觉插件：转写/节奏/旋律/和弦/结构，六件套全离线。人声分离默认走 UVR MDX-Net（onnxruntime，不需要 torch）；依赖在首次运行时自动装，模型只记 URL 不进仓库。",
+    "keywords":  [
+                     "dsh",
+                     "dsh-plugin",
+                     "deepseek-harness",
+                     "audio",
+                     "asr",
+                     "whisper",
+                     "medium",
+                     "bpm",
+                     "melody",
+                     "chord",
+                     "structure",
+                     "demucs"
+                 ],
+    "license":  "MIT",
+    "type":  "module",
+    "main":  "./src/index.js",
+    "exports":  {
+                    ".":  "./src/index.js",
+                    "./client":  "./src/client.js",
+                    "./deps":  "./src/deps.js",
+                    "./package.json":  "./package.json"
+                },
+    "files":  [
+                  "src/*.js",
+                  "python/*.py",
+                  "docs/*.md",
+                  "deps.manifest.json",
+                  "cordis.patch.yml",
+                  "dsh.plugin.json",
+                  "README.md",
+                  "LICENSE"
+              ],
+    "engines":  {
+                    "node":  "\u003e=20"
+                },
+    "scripts":  {
+                    "setup":  "node src/deps.js",
+                    "doctor":  "node -e \"import(\u0027./src/runner.js\u0027).then(m=\u003econsole.log(JSON.stringify(m.environmentReport(),null,2)))\""
+                },
+    "dsh":  {
+                "bundle":  {
+                               "patch":  "./cordis.patch.yml"
+                           },
+                "client":  {
+                               "platform":  "web",
+                               "inject":  [
+
+                                          ]
+                           }
+            },
+    "repository":  {
+                       "type":  "git",
+                       "url":  "git+https://github.com/CixiSVesper/dsh-soundtry.git"
+                   },
+    "homepage":  "https://github.com/CixiSVesper/dsh-soundtry#readme",
+    "bugs":  {
+                 "url":  "https://github.com/CixiSVesper/dsh-soundtry/issues"
+             },
+    "author":  "CixiSVesper",
+    "publishConfig":  {
+                          "access":  "public",
+                          "registry":  "https://registry.npmjs.org"
+                      }
+}
