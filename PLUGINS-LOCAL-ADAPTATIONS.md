@@ -79,6 +79,8 @@
 | dsh-cixisound | `python/soundtry.py` | `patches/cixisound-cuda-libs.patch`（24 行，`git apply --check --reverse` 通过） | 升级后重打；否则 GPU 预检误判无 cublas，永久走 CPU |
 | dsh-cixisound | `~/.dsh/cixisound.json` | 新建，优先于旧 `soundtry.json`（1.0.2 时代 `device:cpu`） | 升级后检查配置是否被重置 |
 
+| dsh-bili-whale | `tools/commands/fav.mjs` | `patches/bili-whale-fav-quality-only.patch`（`git apply --check --reverse` 通过）；2026-11-11 删「每天最多 3 条」与「同类≥2 需 --better」两条数量上限，保留理由≥6 字、同视频 30 天不重复 | 升级后重打；否则两条数量上限会回来 |
+
 **onebot 三个文件的具体差异还没逐行核对**。它们对应的是 QQ 入站（steer/群策略）、工具面、出站护栏——是最容易在升级时悄悄丢的一批改动，升级前必须做一次完整 diff。
 
 ## 5. 更新时怎么保留
@@ -120,3 +122,7 @@
 - [ ] 决定 `@tuhengyu/dsh-full-life-memory` 去留
 - [ ] 决定 `@zaofan/dsh-qqbot` 卸载或启用
 - [ ] 每个 vendor 包补一行「上游仓库 + 拷贝时的 commit」
+
+## 10. 移除记录
+
+- **2026-11-11 移除 `dsh-token-diet`（侧边栏「Token 统计」）**。原因两条：①它取 `ctx.get('sessionPersistence')` 的时机在 DSH 0.2.2-rc.1 里变了（服务后挂载，标准写法是 `ctx.inject`），拿不到就静默 `status.state='ready'` 放弃扫描，索引停在 10-31 只有 4 个会话，11 天没数据；②它的功能被 `dsh-context` 0.82.0（上下文洞察）完全覆盖——后者已有全部会话、token 总量、预估费用、近 7 天用量、活跃度日历、会话列表。备份：`profiles/desktop/package.json.bak-before-token-diet`；旧索引 `token-diet/index.v1.json.bak-20261031`。回退：把 `"dsh-token-diet": "^0.1.0"` 加回 dependencies、`"dsh-token-diet"` 加回 `dsh.profile.bundles`，再 `corepack pnpm install`。

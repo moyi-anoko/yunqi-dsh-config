@@ -1,0 +1,58 @@
+diff --git a/tools/commands/fav.mjs b/tools/commands/fav.mjs
+index 587c33a..74aafa6 100644
+--- a/tools/commands/fav.mjs
++++ b/tools/commands/fav.mjs
+@@ -7,12 +7,12 @@ import { apiGet } from '../lib/bili-api.mjs'
+ //   node bili.mjs fav --list [--json]                  看她收过什么（feed 也读这个）
+ //   node bili.mjs fav --check <BV>                     只判断"能不能收"，不写
+ //
+-// 五条判据（代码强制，不只是提示）：
++// 判据（代码强制，不只是提示）：
+ //   ① 必须有理由（≥6 字）—— 说不清为什么留 = 不收 ✗
+-//   ② 每天最多 3 条
+-//   ③ 同一视频 30 天只收一次
+-//   ④ 同类（按理由首词）已有 ≥2 条 → 除非 --better 否则拒
+-//   ⑤ 先 --dry 再 --go（和其它写操作一致）
++//   ② 同一视频 30 天只收一次
++//   ③ 先 --dry 再 --go（和其它写操作一致）
++//   （2026-11-11 主人要求只保留质量判据、去掉数量上限：原「每天最多 3 条」与
++//     「同类已有 ≥2 条需 --better」两条已删）
+ import fs from 'node:fs'
+ import path from 'node:path'
+ import { dshPath } from '../lib/paths.mjs'
+@@ -104,17 +104,12 @@ function checkRules({ bv, reason, better, kind }) {
+   const d = load()
+   const items = d.items ?? []
+   if (!reason || String(reason).trim().length < 6) return '理由太短（≥6 字）—— 说不清为什么留，就不收 ✗'
+-  const todayCount = items.filter((x) => new Date(x.at).toLocaleDateString('sv-SE') === today()).length
+-  if (todayCount >= 3) return `今天已经收了 ${todayCount} 条（上限 3）—— 剩下的明天再说 ✓`
+   const same = items.filter((x) => x.bv === bv)
+     .sort((a, b) => Date.parse(b.at) - Date.parse(a.at))[0]
+   if (same) {
+     const days = Math.floor((Date.now() - new Date(same.at).getTime()) / DAY)
+     if (days < 30) return `这个 ${days} 天前收过了（30 天内不重复）✓`
+   }
+-  const k = kind || inferKind(reason)
+-  const sameKind = items.filter((x) => x.kind === k)
+-  if (sameKind.length >= 2 && !better) return `「${k}」这类已经收了 ${sameKind.length} 条 —— 除非明显更好（--better），不然别让收藏夹变仓库 ✗`
+   return null
+ }
+ 
+@@ -123,7 +118,7 @@ if (opt.check) {
+   const bv = String(opt.check)
+   const reason = String(opt.reason ?? '')
+   const bad = checkRules({ bv, reason, better: !!opt.better, kind: opt.kind })
+-  console.log(bad ? `✗ 不能收：${bad}` : '✓ 可以收（满足五条判据）')
++  console.log(bad ? `✗ 不能收：${bad}` : '✓ 可以收（满足判据）')
+   process.exit(bad ? 1 : 0)
+ }
+ 
+@@ -150,7 +145,7 @@ catch (error) { console.error(error.message); process.exit(3) }
+ console.log(`[fav] ${bv}  「${info.title.slice(0, 44)}」  @${info.up}`)
+ console.log(`  理由：${reason}`)
+ console.log(`  类别：${String(opt.kind ?? '') || inferKind(reason)}（可选 --kind 想学|想再看|和我有关|以后要提 覆盖）`)
+-console.log(`  收藏夹：「${fav.title}」（media_id=${fav.id}）· 今天第 ${(load().items ?? []).filter((x) => new Date(x.at).toLocaleDateString('sv-SE') === today()).length + 1}/3 条`)
++console.log(`  收藏夹：「${fav.title}」（media_id=${fav.id}）· 今天第 ${(load().items ?? []).filter((x) => new Date(x.at).toLocaleDateString('sv-SE') === today()).length + 1} 条`)
+ 
+ if (!GO && !DRY) { console.error('✗ 必须给 --dry 或 --go'); process.exit(2) }
+ if (DRY) { console.log('  [dry] 未写入 ✓ 确认后把 --dry 换成 --go'); process.exit(0) }

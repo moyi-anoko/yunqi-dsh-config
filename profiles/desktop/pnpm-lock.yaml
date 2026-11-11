@@ -89,12 +89,12 @@ importers:
       dsh-speak-up:
         specifier: 0.3.0
         version: 0.3.0
+      dsh-superagent:
+        specifier: link:C:/Users/35218/.dsh/whale-work/vendor/dsh-superagent
+        version: link:../../whale-work/vendor/dsh-superagent
       dsh-thinking-guard:
         specifier: link:C:/Users/35218/.dsh/whale-work/vendor/thinking-guard
         version: link:../../whale-work/vendor/thinking-guard
-      dsh-token-diet:
-        specifier: ^0.1.0
-        version: 0.1.0
       dsh-univer-office:
         specifier: 0.3.7
         version: 0.3.7(@deepseek-ai/schemastery@3.18.5)
@@ -1107,10 +1107,6 @@ packages:
   dsh-speak-up@0.3.0:
     resolution: {integrity: sha512-QfCLRAbBS2ow6Yc0ED7Fw5Z/uRTGhgpkz1l5+reqZuYKP+z4TP8a6Y6sAtCox/ZZMT/plFH8xJl9rri53yFInQ==}
     engines: {dsh: '>=0.2.1-rc.2', node: '>=22'}
-
-  dsh-token-diet@0.1.0:
-    resolution: {integrity: sha512-PoWUZgkTwOwEwvu8H+Q89lWMBcwAjLpXoxBDsfK9xesjDQNBIKww4I2PrlYVilxkhOfFiOeze1k9D48g3Y8BBg==}
-    engines: {node: '>=22'}
 
   dsh-univer-office@0.3.7:
     resolution: {integrity: sha512-2eEi35ZzTOZiFQEEuNiF68MKWGKlXhVJiaOwCO5gdgNj0ZA+VesdoRxmT8hhFspbMtPfRp/0CoSo7PwFwBbBWw==}
@@ -2464,8 +2460,6 @@ snapshots:
   dsh-see-now@0.2.1: {}
 
   dsh-speak-up@0.3.0: {}
-
-  dsh-token-diet@0.1.0: {}
 
   dsh-univer-office@0.3.7(@deepseek-ai/schemastery@3.18.5):
     dependencies:

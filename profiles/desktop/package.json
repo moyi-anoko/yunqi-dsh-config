@@ -29,8 +29,8 @@
     "dsh-see-now": "0.2.1",
     "dsh-cixisound": "link:C:/Users/35218/.dsh/whale-work/vendor/dsh-cixisound",
     "dsh-speak-up": "0.3.0",
+    "dsh-superagent": "link:C:/Users/35218/.dsh/whale-work/vendor/dsh-superagent",
     "dsh-thinking-guard": "link:C:/Users/35218/.dsh/whale-work/vendor/thinking-guard",
-    "dsh-token-diet": "^0.1.0",
     "dsh-univer-office": "0.3.7",
     "dsh-video-storyboard": "0.7.1",
     "dsh-watch-together": "^0.3.1",
@@ -58,7 +58,6 @@
         "@smalltailqwq/dsh-client-ui-skin-maid-atelier",
         "dsh-pet",
         "dsh-context",
-        "dsh-token-diet",
         "dsh-at-file",
         "dsh-genui",
         "dsh-onebot-qq",
@@ -75,7 +74,8 @@
         "dsh-cookie-guard",
         "dsh-ops",
         "dsh-video-storyboard",
-        "dsh-see-now"
+        "dsh-see-now",
+        "dsh-superagent"
       ]
     }
   }
