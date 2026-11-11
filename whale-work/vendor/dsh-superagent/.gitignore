@@ -1,5 +1,5 @@
 node_modules/
-lib/
+# lib/ 是构建产物，但本机没装构建链；提交它才能在恢复时直接用
 .artifacts/
 .env
 coverage/

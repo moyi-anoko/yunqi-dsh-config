@@ -46,7 +46,7 @@
 | modlens | @liustack/modlens | 3.27.1 | 视觉桥 | npm |
 | — | @zaofan/dsh-qqbot | 1.12.6 | 另一个 QQ 插件 | npm，**装了但不在 bundles 里，未启用** |
 
-## 2. 清单 B：本地 vendor（8 个，无 git）
+## 2. 清单 B：本地 vendor（9 个，无 git）
 
 路径：`C:\Users\35218\.dsh\whale-work\vendor\<name>`
 
@@ -60,6 +60,7 @@
 | dsh-cixisound | dsh-cixisound | 1.0.3 | 听觉六件套 | `python/soundtry.py` 补 CUDA DLL 目录探测（见第 4 节）；旧目录留 `dsh-soundtry.bak-1.0.2` |
 | thinking-guard | dsh-thinking-guard | — | 思考逃逸阀 | 未见备份 |
 | qian-music-dsh | qian-music-dsh | 0.3.1 | 音乐播放器 | `package.json.bak-20261104-client`（加 `client` 入口） |
+| dsh-superagent | dsh-superagent | 0.1.0 | 编排：总台 + 工单 + worker | `lib/poll-BZfc2pr3.js` 的 worker gitconfig 补 `credential.helper = manager`（见第 4 节） |
 
 ## 3. 清单 C：本地路径插件
 
@@ -80,6 +81,7 @@
 | dsh-cixisound | `~/.dsh/cixisound.json` | 新建，优先于旧 `soundtry.json`（1.0.2 时代 `device:cpu`） | 升级后检查配置是否被重置 |
 
 | dsh-bili-whale | `tools/commands/fav.mjs` | `patches/bili-whale-fav-quality-only.patch`（`git apply --check --reverse` 通过）；2026-11-11 删「每天最多 3 条」与「同类≥2 需 --better」两条数量上限，保留理由≥6 字、同视频 30 天不重复 | 升级后重打；否则两条数量上限会回来 |
+| dsh-superagent | `lib/poll-BZfc2pr3.js` | `patches/superagent-worker-gitconfig-credential.patch`（13 行，`patch -p1 -R --dry-run` 通过）；2026-11-11 把 `worker-gitconfig` 里空的 `credential.helper` 改成 `manager` | 升级后重打；否则 superagent 会把 `GIT_CONFIG_GLOBAL` 指向这个文件，DSH 内所有 git 读不到系统凭据，push 报 `could not read Username` |
 
 **onebot 三个文件的具体差异还没逐行核对**。它们对应的是 QQ 入站（steer/群策略）、工具面、出站护栏——是最容易在升级时悄悄丢的一批改动，升级前必须做一次完整 diff。
 
