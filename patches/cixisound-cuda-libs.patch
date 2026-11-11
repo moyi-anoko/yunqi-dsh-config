@@ -1,0 +1,29 @@
+diff --git a/python/soundtry.py b/python/soundtry.py
+index 7e4c644..412a453 100644
+--- a/python/soundtry.py
++++ b/python/soundtry.py
+@@ -900,6 +900,24 @@ def cmd_transcribe(args):
+         import ctypes
+         if not str(args.device).startswith("cuda"):
+             return True
++        # 本地适配（2026-11-11）：pip 装的 nvidia-*-cu12 把 DLL 放在 venv 的
++        # site-packages/nvidia/*/bin 下，既不在 PATH，Python 3.8+ 的 ctypes.CDLL
++        # 也不再搜索 PATH —— 必须显式 add_dll_directory，否则误判「没有 cublas」。
++        try:
++            import glob as _glob
++            import os as _os
++            import sys as _sys
++            _sp = _os.path.join(
++                _os.path.dirname(_os.path.dirname(_sys.executable)),
++                "Lib", "site-packages", "nvidia",
++            )
++            for _d in _glob.glob(_os.path.join(_sp, "*", "bin")):
++                try:
++                    _os.add_dll_directory(_d)
++                except OSError:
++                    pass
++        except Exception:
++            pass
+         for dll in ("cublas64_12.dll", "cublasLt64_12.dll"):
+             try:
+                 ctypes.CDLL(dll)

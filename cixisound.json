@@ -1,0 +1,6 @@
+{
+  "python": "C:/Users/35218/AppData/Local/Programs/Python/Python312/python.exe",
+  "device": "cuda",
+  "compute": "float16",
+  "deps": "selfcontained"
+}

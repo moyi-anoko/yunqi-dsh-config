@@ -1,0 +1,12 @@
+# dsh-cixisound 1.0 — 把插件插进 harness 配置树。
+# 和其它 bundle patch 同一形状：一条 insert，`name` 从 profile 的 node_modules 解析。
+#
+# 安装（本地开发，link 到源码目录）：
+#   node --expose-internals "<DSH>/resources/app/lib/plugin-cli.js" desktop install <这个目录>
+#
+# 首次调用 sound_* 时会自动装依赖（见 deps.manifest.json）：
+#   有带 torch 的 Python（例如 ComfyUI）→ borrow 模式，磁盘增量约 110 MB；
+#   没有 → standalone 模式，整套装进插件 venv（约 7 GB）。
+- insert:
+    - id: dsh-cixisound
+      name: dsh-cixisound

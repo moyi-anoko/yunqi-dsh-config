@@ -1,0 +1,11 @@
+{
+  "name": "dsh-cixisound",
+  "description": "DSH-CixiSound: local audio understanding for DeepSeek Harness — transcription, rhythm, melody, chords, structure (six tools, fully offline). Vocal separation defaults to UVR MDX-Net via onnxruntime (no torch).",
+  "version": "1.0.3",
+  "entry": {
+    "name": "dsh-cixisound",
+    "inject": [
+      "tools"
+    ]
+  }
+}

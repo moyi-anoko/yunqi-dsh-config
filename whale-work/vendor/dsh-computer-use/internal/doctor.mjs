@@ -91,6 +91,7 @@ export function collectDoctorReport({
   registrationFailures = [],
   registeredToolNames = [],
   schemaVisibility = { enabled: false, liveAgents: 0, restrictedSessions: 0 },
+  indicator = null,
   backend = null,
   hideToolSchemasWhenOff = true,
   insideHost = false,
@@ -146,16 +147,16 @@ export function collectDoctorReport({
 
   if (!worker.exists) {
     note('fatal', 'WORKER_SCRIPT_MISSING',
-      `后台脚本不在：${worker.path}。包没有按插件根解压时最容易出现这一条。`,
-      '按 INSTALL.md 重新解压，确认 backend/worker.ps1 与 backend/release-input.ps1 都在。');
+      `后台可执行文件不在：${worker.path}。包没有按插件根解压时最容易出现这一条。`,
+      '按 INSTALL.md 重新解压，确认 backend/dsh-worker.exe 与 backend/dsh-worker.exe.config 都在。');
   }
 
   // 1.39.5 的 doctor 采集了 release 状态，却只对 worker 缺失报 fatal：隔离副本删掉
   // release-input.ps1 后仍然 ok=true（方案 §H 已复现）。这里把它变成阻断项。
   if (!releaseScript.exists) {
     note('fatal', 'RELEASE_SCRIPT_MISSING',
-      `释放脚本不在：${releaseScript.path}。worker 被强杀时宿主会亲自运行它来释放按住的键；缺了它，那条路径只能失败。`,
-      '按 INSTALL.md 重新解压完整包；不要只复制 worker.ps1。');
+      `输入释放后端不在：${releaseScript.path}。worker 被强杀时宿主会亲自运行它来释放按住的键；缺了它，那条路径只能失败。`,
+      '按 INSTALL.md 重新解压完整包；不要只复制单个可执行文件。');
   }
 
   if (!releaseReport.present) {
@@ -279,20 +280,7 @@ export function collectDoctorReport({
     }
   }
 
-  if (!powershell.found) {
-    note('fatal', 'POWERSHELL_MISSING',
-      `找不到可用的 PowerShell（尝试过：${POWERSHELL_CANDIDATES.join('、')}）；worker 起不来时，每个 computer_* 调用都会失败。`,
-      '确认 %SystemRoot%\\System32\\WindowsPowerShell\\v1.0\\powershell.exe 存在；企业策略移除 Windows PowerShell 的机器上需要单独装回来。');
-  } else if (powershell.source === 'path') {
-    note('info', 'POWERSHELL_FROM_PATH',
-      `PowerShell 从 PATH 解析为 ${powershell.command}。`,
-      '这条路径可用；如果它不是 Windows PowerShell 5.1，截图/UIA 可能缺 GAC 程序集，doctor 的后续能力检查会暴露。');
-  }
-  if (powershell.found && /(^|[\\/])pwsh(\.exe)?$/i.test(powershell.command)) {
-    note('warn', 'POWERSHELL_7_SELECTED',
-      `只找到 PowerShell 7（${powershell.command}）；它不保证带 GAC 里的 WinForms / Drawing / UI Automation 程序集。`,
-      '优先安装/保留 Windows PowerShell 5.1；PowerShell 7 不是 Windows PowerShell 的无条件等价替换。');
-  }
+  // The desktop worker is a compiled EXE. PowerShell availability is informational only.
 
   if (!browser.webSocket || !browser.fetch) {
     note('warn', 'BROWSER_CAPABILITY_MISSING',
@@ -358,6 +346,54 @@ export function collectDoctorReport({
       if (entry && typeof entry.code === 'string') {
         note(entry.level ?? 'warn', entry.code, entry.message ?? '', entry.action ?? '');
       }
+    }
+  }
+
+  // ---- 交互提示 helper 的部署与投递（阶段 1 / 阶段 2 的诊断面）----
+  //
+  // 这一节存在的理由：低完整性角色进程装得上钩子、却收不到当前桌面的输入。表现为
+  // "只有待机和移动，点击/拖拽全都没有"，而所有自检都通过。所以这里必须把
+  // 路径、软链、文件标签、进程完整性、投递状态分开说，并且给出可执行的处理动作。
+  if (indicator !== null && typeof indicator === 'object') {
+    const identity = indicator.identity ?? null;
+    if (identity !== null && typeof identity === 'object') {
+      const rid = Number(identity.integrityRid);
+      if (Number.isFinite(rid) && rid < 0x2000) {
+        note('fatal', 'INDICATOR_INTEGRITY_TOO_LOW',
+          `交互提示 helper 以 ${String(identity.integrityName ?? 'low')} 完整性运行（RID=${rid}），` +
+            `路径 ${String(indicator.exePath ?? 'unknown')}。低完整性进程装得上 WH_MOUSE_LL / WH_KEYBOARD_LL，` +
+            '但 UIPI 不会把用户桌面上的输入投递给它：角色只能看到位置轮询，点击/拖拽/滚轮都没有反馈。',
+          '把 helper 部署到普通用户安装位置（tools/deploy-helper.ps1），不要从带 Low 标签的源码树直接启动；' +
+            '部署后用 doctor 核对 integrityName 至少是 medium，再看 deliveryState。');
+      } else if (Number.isFinite(rid) && identity.uiAccess === true) {
+        note('info', 'INDICATOR_UIACCESS',
+          '交互提示 helper 带 UIAccess 运行；本轮不自动请求该权限，也不依赖它。',
+          '除非明确需要覆盖更高完整性窗口，否则保持普通 Medium 运行即可。');
+      }
+    }
+    const delivery = String(indicator.deliveryState ?? '');
+    if (delivery === 'anomalous') {
+      note('warn', 'INDICATOR_INPUT_NOT_DELIVERED',
+        '交互提示 helper 的钩子已安装，但独立观察到的位置/按键变化没有对应的钩子回调：系统没有把输入投递给它。' +
+          `（重装次数 ${String(indicator.hookReinstalls ?? 0)}，降级采样重同步 ${String(indicator.sampledResyncs ?? 0)}）`,
+        '先看 INDICATOR_INTEGRITY_TOO_LOW；完整性正常时，这一条通常意味着钩子线程被系统摘掉或桌面不可访问，' +
+          'helper 会按 0.5/1/2/5 秒退避重装有界次数，并在期间用降级采样维持按钮状态。');
+    } else if (delivery === 'unavailable') {
+      note('warn', 'INDICATOR_HOOK_MISSING',
+        '交互提示 helper 没能装上鼠标钩子，输入反馈与物理 Esc 都不可用。',
+        '看 helper 的 mouseHookError；常见原因是运行身份或安全软件拦截。');
+    }
+    if (indicator.escapeReady === false && (indicator.state === 'active' || indicator.state === 'ready')) {
+      note('fatal', 'INDICATOR_ESCAPE_NOT_READY',
+        '交互提示 helper 的键盘钩子没装上：物理 Esc 停止通道不可用（鼠标钩子成功不能代替它）。',
+        '先修好键盘通道再派发写操作；不要拿 hookReady 当 Esc 可用的证明。');
+    }
+    const created = Number(indicator.feedbackCreated);
+    const presented = Number(indicator.feedbackPresented);
+    if (Number.isFinite(created) && created > 0 && Number.isFinite(presented) && presented === 0) {
+      note('warn', 'INDICATOR_FEEDBACK_NEVER_PRESENTED',
+        `已收到 ${created} 条反馈，但没有任何一条成功呈现：角色可能根本没画出来（反馈计数不等于用户看见了）。`,
+        '看 characterSurface / cursorVisible 与 feedbackDropReason；先确认角色窗口真的在显示，再谈动作映射。');
     }
   }
 
@@ -431,6 +467,9 @@ export function collectDoctorReport({
         failures: registrationFailures.map((entry) => ({ ...entry })),
       },
       schemaVisibility: { ...schemaVisibility, hideToolSchemasWhenOff },
+      // 覆盖层的三个事实（方案 4.9 的 trace）：开关、helper 在不在、当前状态与首帧耗时。
+      // 排障时"没有横幅"与"helper 根本没起来"是两件事，报告里必须能分开看。
+      indicator: indicator === null || indicator === undefined ? null : { ...indicator },
       backend: backend === null ? null : { ...backend },
       browser,
       host,

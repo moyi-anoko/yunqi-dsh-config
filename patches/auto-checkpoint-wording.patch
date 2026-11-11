@@ -1,0 +1,22 @@
+diff --git a/auto-checkpoint/index.js b/auto-checkpoint/index.js
+index beea6b7..07e6ef2 100644
+--- a/auto-checkpoint/index.js
++++ b/auto-checkpoint/index.js
+@@ -923,7 +923,7 @@ function claimedHumanMessage(messages) {
+  * 落档催办文案的**固定开头** —— 与生成它的地方（`[auto-checkpoint] 上下文即将压缩（当前 …`）
+  * 共用同一个常量：**改文案时两处一起改**，否则白名单会静默失效。
+  */
+-const PRECOMPACT_NUDGE_LEAD = '[auto-checkpoint] 上下文即将压缩（当前 '
++const PRECOMPACT_NUDGE_LEAD = '[auto-checkpoint] 上下文即将压缩（累计 '
+ 
+ /**
+  * 判断"这批待处理消息里是不是本插件的**落档催办**"（2026-10-11 加，用户拍板）。
+@@ -3341,7 +3341,7 @@ export function apply(ctx, config = {}) {
+         ? `[auto-checkpoint] 这个会话的**图片体积已达 ${imageMb.toFixed(1)} MB**` +
+           `（图片水位 ${IMAGE_WATERMARK_MB} MB；token 只到 ${Math.round(total)}）。\n` +
+           `⚠️ 图片是**另一条独立的死法**：体积撑爆请求体 ⇒ 上游 5 分钟不吐字、**沉默卡死**、连 400 都不给。\n`
+-        : `[auto-checkpoint] 当前上下文压力已达 ${Math.round(total)} token` +
++        : `[auto-checkpoint] 累计上下文压力已达 ${Math.round(total)} token（上游计费口径，非当前窗口）` +
+           (atBoundary && !overPressure
+             ? `（你刚完成一个任务，且在任务边界水位 ${Math.round(runtime.taskBoundaryTokens)} 之上——` +
+               `**趁任务接缝交接，比做到一半被切断更好**）。`

@@ -57,7 +57,7 @@
 | dsh-memewiki | dsh-memewiki | 0.1.20 | 梗百科 | 未见备份 |
 | dsh-music-analyze | dsh-music-analyze | 0.2.0 | 音乐四联图 | 未见备份 |
 | dsh-persona-distill | dsh-persona-distill | 2.1.1 | 人格蒸馏 | 未见备份 |
-| dsh-soundtry | dsh-soundtry | 1.0.2 | 听觉六件套 | 未见备份 |
+| dsh-cixisound | dsh-cixisound | 1.0.3 | 听觉六件套 | `python/soundtry.py` 补 CUDA DLL 目录探测（见第 4 节）；旧目录留 `dsh-soundtry.bak-1.0.2` |
 | thinking-guard | dsh-thinking-guard | — | 思考逃逸阀 | 未见备份 |
 | qian-music-dsh | qian-music-dsh | 0.3.1 | 音乐播放器 | `package.json.bak-20261104-client`（加 `client` 入口） |
 
@@ -76,6 +76,8 @@
 | dsh-onebot-qq | `lib/outbound.js` | 修改时间 11-09，无备份 | 同上 |
 | auto-checkpoint | `index.js` | `.bak-before-wording` | 改的是措辞，合并时看 `diff` |
 | qian-music-dsh | `package.json` | `.bak-20261104-client` | 加的是 `client` 入口，重装后补一行 |
+| dsh-cixisound | `python/soundtry.py` | `patches/cixisound-cuda-libs.patch`（24 行，`git apply --check --reverse` 通过） | 升级后重打；否则 GPU 预检误判无 cublas，永久走 CPU |
+| dsh-cixisound | `~/.dsh/cixisound.json` | 新建，优先于旧 `soundtry.json`（1.0.2 时代 `device:cpu`） | 升级后检查配置是否被重置 |
 
 **onebot 三个文件的具体差异还没逐行核对**。它们对应的是 QQ 入站（steer/群策略）、工具面、出站护栏——是最容易在升级时悄悄丢的一批改动，升级前必须做一次完整 diff。
 
@@ -112,6 +114,7 @@
 
 ## 9. 待办
 
+- [x] dsh-cixisound 升到 1.0.3（GPU float16 已验证，387s 音频 29.5s / 13.1x）
 - [ ] 给 `whale-work/vendor/` 建 git（每个目录独立 `git init` + 首次提交），或整目录一个仓
 - [ ] onebot 三个文件与 `.bak` 做逐行 diff，把改动写进第 4 节
 - [ ] 决定 `@tuhengyu/dsh-full-life-memory` 去留

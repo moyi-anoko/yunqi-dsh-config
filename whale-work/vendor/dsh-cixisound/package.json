@@ -1,0 +1,78 @@
+{
+  "name": "dsh-cixisound",
+  "version": "1.0.3",
+  "description": "DSH-CixiSound：DSH 的本地听觉与卡点插件。转写/节奏/旋律/和弦/结构六件套 + 「读到能剪」的卡点流水线。自带隔离 venv，不依赖 ComfyUI，也不需要 torch。",
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "deepseek-harness",
+    "deepseek",
+    "audio",
+    "audio-analysis",
+    "asr",
+    "speech-to-text",
+    "whisper",
+    "faster-whisper",
+    "vocal-separation",
+    "demucs",
+    "onnxruntime",
+    "beat-detection",
+    "bpm",
+    "beat-grid",
+    "cut-to-beat",
+    "music-information-retrieval",
+    "lyrics",
+    "subtitle",
+    "offline",
+    "windows",
+    "local"
+  ],
+  "license": "MIT",
+  "type": "module",
+  "main": "./src/index.js",
+  "exports": {
+    ".": "./src/index.js",
+    "./client": "./src/client.js",
+    "./deps": "./src/deps.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "src/*.js",
+    "python/*.py",
+    "docs/*.md",
+    "deps.manifest.json",
+    "cordis.patch.yml",
+    "dsh.plugin.json",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "setup": "node src/deps.js",
+    "doctor": "node -e \"import('./src/runner.js').then(m=>console.log(JSON.stringify(m.environmentReport(),null,2)))\""
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "inject": []
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CixiSVesper/dsh-soundtry.git"
+  },
+  "homepage": "https://github.com/CixiSVesper/dsh-soundtry#readme",
+  "bugs": {
+    "url": "https://github.com/CixiSVesper/dsh-soundtry/issues"
+  },
+  "author": "CixiSVesper",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org"
+  }
+}

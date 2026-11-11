@@ -17,6 +17,9 @@ whale-work/*
 !whale-work/vendor/
 
 # vendor 里的大资源：代码进仓库，模型和 ffmpeg 不进
+whale-work/vendor/dsh-cixisound/models/
+whale-work/vendor/dsh-cixisound/vendor/ffmpeg/
+whale-work/vendor/dsh-cixisound/runtime/
 whale-work/vendor/dsh-soundtry/models/
 whale-work/vendor/dsh-soundtry/vendor/ffmpeg/
 whale-work/vendor/dsh-memewiki/data/memes.db

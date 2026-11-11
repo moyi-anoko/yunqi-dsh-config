@@ -1,0 +1,6 @@
+{
+  "python": "C:\\Users\\35218\\.dsh\\whale-work\\_pyruntime\\py312\\python.exe",
+  "device": "cpu",
+  "compute": "int8",
+  "deps": "borrow"
+}

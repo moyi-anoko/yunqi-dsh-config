@@ -47,6 +47,9 @@ importers:
       dsh-bili-whale:
         specifier: https://github.com/Alterssss/dsh-bili-whale/tarball/main
         version: https://github.com/Alterssss/dsh-bili-whale/tarball/main
+      dsh-cixisound:
+        specifier: link:C:/Users/35218/.dsh/whale-work/vendor/dsh-cixisound
+        version: link:../../whale-work/vendor/dsh-cixisound
       dsh-context:
         specifier: 0.82.0
         version: 0.82.0(@deepseek-ai/schemastery@3.18.5)
@@ -83,9 +86,6 @@ importers:
       dsh-see-now:
         specifier: 0.2.1
         version: 0.2.1
-      dsh-soundtry:
-        specifier: file:../../whale-work/vendor/dsh-soundtry
-        version: file:../../whale-work/vendor/dsh-soundtry
       dsh-speak-up:
         specifier: 0.3.0
         version: 0.3.0
@@ -826,6 +826,8 @@ packages:
       '@deepseek-ai/dsh-session': '>=0.1.0-rc.6'
       '@deepseek-ai/dsh-settings': '*'
       '@deepseek-ai/dsh-tools': '>=0.1.1-rc.2'
+      '@deepseek-ai/schemastery': '*'
+      '@tencent-connect/qqbot-connector': 1.2.0
     peerDependenciesMeta:
       '@deepseek-ai/cordis':
         optional: true
@@ -834,6 +836,8 @@ packages:
       '@deepseek-ai/dsh-llm':
         optional: true
       '@deepseek-ai/dsh-session':
+        optional: true
+      '@deepseek-ai/schemastery':
         optional: true
 
   adm-zip@0.6.1:
@@ -1051,6 +1055,7 @@ packages:
       '@deepseek-ai/dsh-typert-protocol': '>=0.1.5-rc.1 <0.1.6-0 || >=0.1.6-alpha.1 <0.1.7-0 || >=0.1.7-alpha.1 <0.2.0-0 || >=0.2.0-rc.1 <0.3.0-0'
       '@deepseek-ai/dsh-util-values': '>=0.1.5-rc.1 <0.1.6-0 || >=0.1.6-alpha.1 <0.1.7-0 || >=0.1.7-alpha.1 <0.2.0-0 || >=0.2.0-rc.1 <0.3.0-0'
       '@deepseek-ai/schemastery': ^3.18.0 || >=3.18.6-alpha.1 <3.19.0-0
+      schemastery: ^3.18.0
 
   dsh-ops@0.5.2:
     resolution: {integrity: sha512-r05cj6UaB80+0hH12bm5IvV58y5MQdn46Jtqb3pYw+KVwMGC2CrFFEldUHO+khorbWA3PiZDenRHUX2crWJVtw==}
@@ -1098,10 +1103,6 @@ packages:
     peerDependenciesMeta:
       '@deepseek-ai/dsh-tools':
         optional: true
-
-  dsh-soundtry@file:../../whale-work/vendor/dsh-soundtry:
-    resolution: {directory: ../../whale-work/vendor/dsh-soundtry, type: directory}
-    engines: {node: '>=20'}
 
   dsh-speak-up@0.3.0:
     resolution: {integrity: sha512-QfCLRAbBS2ow6Yc0ED7Fw5Z/uRTGhgpkz1l5+reqZuYKP+z4TP8a6Y6sAtCox/ZZMT/plFH8xJl9rri53yFInQ==}
@@ -2404,9 +2405,7 @@ snapshots:
 
   dijkstrajs@1.0.3: {}
 
-  dsh-at-file@0.6.3:
-    dependencies:
-      zod: 4.6.7
+  dsh-at-file@0.6.3: {}
 
   dsh-bili-whale@https://github.com/Alterssss/dsh-bili-whale/tarball/main:
     dependencies:
@@ -2463,8 +2462,6 @@ snapshots:
       - ws
 
   dsh-see-now@0.2.1: {}
-
-  dsh-soundtry@file:../../whale-work/vendor/dsh-soundtry: {}
 
   dsh-speak-up@0.3.0: {}
 
