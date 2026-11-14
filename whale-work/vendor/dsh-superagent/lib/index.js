@@ -8069,7 +8069,11 @@ var Inputs = class {
 				source: input.sourceId,
 				threads: [{
 					source: input.sourceId,
-					id: subjectId
+					id: (() => {
+						const note = input.provenance?.note;
+						const match = typeof note === "string" ? /(?:^|\|)thread:([^|]+)/.exec(note) : null;
+						return match ? match[1].trim() : input.channel?.thread ?? input.dedupeKey ?? subjectId;
+					})()
 				}],
 				actor: {
 					source: input.sourceId,
@@ -11005,7 +11009,13 @@ function executorTools(host, ticket) {
 					};
 					const updated = host.engine.report(ticketId, report);
 					const relay = reportRelay(updated, report);
-					if (relay) host.sessions.relay(relay.id, relay.text);
+					if (relay) {
+						host.sessions.relay(relay.id, relay.text);
+						const note = host.store.get(KV.input.records(updated.origin?.triggerId))?.envelope?.provenance?.note;
+						const sessionMatch = typeof note === "string" ? /(?:^|\|)session:([^|]+)/.exec(note) : null;
+						const origin = sessionMatch ? sessionMatch[1].trim() : void 0;
+						if (origin) host.sessions.prompt(origin, relay.id, relay.text, "steer");
+					}
 					return {
 						reported: true,
 						notification: relay ? "orchestrator" : "internal_only",

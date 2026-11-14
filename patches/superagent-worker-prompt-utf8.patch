@@ -1,13 +1,14 @@
 diff --git a/prompts/work.md b/prompts/work.md
-index b6f532c..9993a31 100644
+index b6f532c..300b3fa 100644
 --- a/prompts/work.md
 +++ b/prompts/work.md
-@@ -7,6 +7,8 @@ If direction is unresolved or code inspection reveals changed behavior, public i
+@@ -7,6 +7,9 @@ If direction is unresolved or code inspection reveals changed behavior, public i
  
  A thread attached to this ticket after it started may turn out not to be about it: read its original messages first, and if it is unrelated, call orchestrator_thread_unrelated with the thread key and a one-sentence reason; do not acknowledge it or reply there.
  Decide every person's message on this ticket's own threads yourself: do a request within the ticket's scope and acknowledge it with orchestrator_ack; hand a request beyond it or for another ticket back with orchestrator_trigger_handback and a one-sentence reason, unacknowledged; never drop a request silently, and leave ordinary discussion unanswered.
 +When a task writes a text file, write it as UTF-8 without a byte-order mark; do not let a shell default add one, and check the first three bytes of every file you create before reporting success.
 +A file that starts with EF BB BF or U+FEFF is not verified even when its text reads back correctly.
++When a task names a file, folder or path, check that path only. If it does not exist or holds nothing suitable, report what the path actually contains and stop; do not widen the search to other folders, drives or the whole machine unless the ticket explicitly asks for a sweep.
  Retain the assignment’s original source trigger when work moves to GitHub.
  Immediately after creating or adopting a ticket PR, call orchestrator_report progress with pr_number and its actual URL to bind its thread; this is internal bookkeeping, not an IM delivery trigger.
  Continue checks and review silently until ready.
