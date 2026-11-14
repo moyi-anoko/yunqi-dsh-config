@@ -115,6 +115,42 @@ async function submit(text, thread, session) {
   return { port, subjectId, ...j };
 }
 
+/**
+ * 直接往另一个 DSH 会话投一条消息（steer），不建工单。
+ * superagent 收到 provenance.note 里的 target:<会话id> 就不再开票，直接 sessions.prompt。
+ */
+async function tell(sessionId, text, from = process.env.DSH_SESSION_ID || '') {
+  const envelope = from
+    ? `【跨会话传话·来自 ${from}】处理完用 orch.mjs tell ${from} "结果" 回话。\n\n${text}`
+    : text;
+  const port = await findPort();
+  if (!port) throw new Error('找不到 superagent（DSH 没起或面板没开）');
+  const sres = await fetch(`http://127.0.0.1:${port}/orchestrator/api/subject`, { headers: H, signal: AbortSignal.timeout(4000) });
+  if (!sres.ok) throw new Error(`拿 subject 失败 HTTP ${sres.status}`);
+  const sj = await sres.json();
+  const subjectId = sj.subjectId || sj.id;
+  if (!subjectId) throw new Error('subject 返回里没有 id');
+  const stamp = `tell-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+  const res = await fetch(`http://127.0.0.1:${port}/orchestrator/api/inputs`, {
+    method: 'POST',
+    headers: H,
+    signal: AbortSignal.timeout(15000),
+    body: JSON.stringify({
+      subjectId,
+      sourceId: 'local',
+      externalEventId: stamp,
+      dedupeKey: stamp,
+      payload: { text: envelope },
+      layer: 'person',
+      human: true,
+      provenance: { note: 'target:' + sessionId },
+    }),
+  });
+  const j = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(`投递失败 HTTP ${res.status}: ${JSON.stringify(j).slice(0, 200)}`);
+  return { port, ...j };
+}
+
 async function waitFor(id, timeoutMs = 300000, everyMs = 3000) {
   const start = Date.now();
   let last = '';
@@ -165,6 +201,19 @@ try {
     const resolved = thread === 'auto' || !thread ? deriveThread(session) || `yunqi-${Date.now()}` : thread;
     const r = await submit(text, resolved, session);
     log(`triggerId ${r.triggerId}  outcome ${r.outcome}  port ${r.port}  thread ${resolved}`);
+  } else if (cmd === 'tell') {
+    const raw = process.argv.slice(3);
+    let from = process.env.DSH_SESSION_ID || '';
+    const rest = [];
+    for (let i = 0; i < raw.length; i++) {
+      if (raw[i] === '--from' && raw[i + 1]) { from = raw[++i]; }
+      else rest.push(raw[i]);
+    }
+    const sessionId = rest.shift();
+    const text = rest.join(' ').trim();
+    if (!sessionId || !text) { log('用法: orch.mjs tell <会话id> "文本" [--from <来源会话id>]'); process.exit(2); }
+    const r = await tell(sessionId, text, from);
+    log(`delivered ${r.triggerId}  outcome ${r.outcome}  port ${r.port}  target ${sessionId}`);
   } else if (cmd === 'wait') {
     const id = process.argv[3];
     if (!id) { log('用法: orch.mjs wait <ticketId>'); process.exit(2); }
@@ -181,7 +230,7 @@ try {
       if (b.summary) log(`    ${b.summary.slice(0, 160)}`);
     }
   } else {
-    log('命令: status | submit [--thread <线程>] [--session <会话id>] "任务" | wait <id> | tickets');
+    log('命令: status | submit [--thread <线程>] [--session <会话id>] "任务" | tell <会话id> "文本" [--from <来源>] | wait <id> | tickets');
     process.exit(2);
   }
 } catch (e) {

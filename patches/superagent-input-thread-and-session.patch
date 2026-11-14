@@ -1,8 +1,37 @@
 diff --git a/lib/index.js b/lib/index.js
-index ea4c654..ef78f5e 100644
+index ea4c654..29e077b 100644
 --- a/lib/index.js
 +++ b/lib/index.js
-@@ -8069,7 +8069,11 @@ var Inputs = class {
+@@ -8034,6 +8034,28 @@ var Inputs = class {
+ 		if (input.subjectId !== subjectId) throw new InputError("subject_mismatch", `The input names another subject; this installation is ${subjectId}`);
+ 		if (!this.host.trusted(input.sourceId)) throw new InputError("source_not_trusted", `Only a trusted local source may submit inputs; ${input.sourceId} cannot`);
+ 		if (input.channel && input.channel.source !== input.sourceId) throw new InputError("invalid", `The channel names ${input.channel.source}, but only ${input.sourceId} may write back to it`);
++		// A note carrying `target:<sessionId>` is a direct hand-off to another DSH session:
++		// deliver it as a steering message there and do not open a ticket. Tickets are for work
++		// an executor performs; moving text between sessions is not such work.
++		const target = (() => {
++			const note = input.provenance?.note;
++			if (typeof note !== "string") return void 0;
++			const match = /(?:^|\|)target:([^|]+)/.exec(note);
++			return match ? match[1].trim() : void 0;
++		})();
++		if (target) {
++			const messageId = key("tell", target, input.dedupeKey);
++			try {
++				const delivered = this.host.sessions.prompt(target, messageId, input.payload.text, "steer");
++				if (delivered && typeof delivered.catch === "function") delivered.catch(() => {});
++			} catch (error) {
++				throw new InputError("unavailable", `Cannot deliver to ${target}: ${error instanceof Error ? error.message : String(error)}`);
++			}
++			return {
++				triggerId: messageId,
++				outcome: "stored"
++			};
++		}
+ 		const triggerId = key("input", input.sourceId, input.dedupeKey);
+ 		return this.host.store.atomic(() => {
+ 			const existing = this.host.store.get(KV.input.records(triggerId));
+@@ -8069,7 +8091,11 @@ var Inputs = class {
  				source: input.sourceId,
  				threads: [{
  					source: input.sourceId,
@@ -15,7 +44,7 @@ index ea4c654..ef78f5e 100644
  				}],
  				actor: {
  					source: input.sourceId,
-@@ -11005,7 +11009,13 @@ function executorTools(host, ticket) {
+@@ -11005,7 +11031,13 @@ function executorTools(host, ticket) {
  					};
  					const updated = host.engine.report(ticketId, report);
  					const relay = reportRelay(updated, report);
@@ -30,3 +59,11 @@ index ea4c654..ef78f5e 100644
  					return {
  						reported: true,
  						notification: relay ? "orchestrator" : "internal_only",
+@@ -11248,6 +11280,7 @@ var Runtime = class extends Service {
+ 			const inputs = this.inputs = new Inputs({
+ 				store,
+ 				subject: this.subject,
++				sessions,
+ 				trusted: (source) => sources.trusted(source),
+ 				receive: (trigger) => engine.receive(trigger),
+ 				request: () => this.passes.request(),
